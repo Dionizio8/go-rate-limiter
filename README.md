@@ -26,7 +26,38 @@ As configurações de limite do token de acesso devem se sobrepor as do IP. Ex: 
 - [X] Todas as informações de "limiter” devem ser armazenadas e consultadas de um banco de dados Redis. Você pode utilizar docker-compose para subir o Redis.
 - [X] Crie uma “strategy” que permita trocar facilmente o Redis por outro mecanismo de persistência.
 - [X] A lógica do limiter deve estar separada do middleware.
-
+###
 
 ## Implementação:
 * Foi utilizado a solução de [RATE LIMITING REDIS](https://redis.io/glossary/rate-limiting/), mas poderia utilizar outra implementção no [*RateLimitRepositoryInterface*](pkg/rtl/entity/interface.go).
+###
+
+## Executando Projeto Localmente:
+Para inicializar o projeto para realizar testes locais:
+
+```bash
+make up
+```
+
+__Url local para testes : http://localhost:8080/__ *(para realizar testes com token basta adicionar o **API_KEY** no header)*
+
+## Executando Testes
+Executando os testes:
+```bash
+make test
+```
+###
+
+## Config
+### Envs
+[/cmd/.env](cmd/.env)
+- **WEB_SERVER_PORT:** Porta do servidor web.
+- **REDIS_HOST:** Host do Redis.
+- **REDIS_PORT:** Porta do Redis.
+- **RTL_IP:** Quantidade máxima de requisições por IP por segundo.
+- **RTL_BLOCK_TIME:** Tempo em que o cliente será bloqueado se ultrapassar o limite de requisições.
+### Tokens
+[/cmd/tokens.json](cmd/tokens.json)
+- **token:** Token de acesso.
+- **expiration_time:** Tempo de expiração do token.
+###

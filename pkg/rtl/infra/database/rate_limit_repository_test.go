@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"os"
 	"testing"
 	"time"
 
@@ -18,6 +19,9 @@ func TestMain(m *testing.M) {
 		Addr: redis_addr,
 		DB:   0,
 	})
+
+	code := m.Run()
+	os.Exit(code)
 }
 
 func TestRateLimitRepository_GetByKey_Ok(t *testing.T) {
@@ -45,27 +49,29 @@ func TestRateLimitRepository_GetByKey_NotFount(t *testing.T) {
 }
 
 func TestRateLimitRepository_Add_Ok(t *testing.T) {
+	rdb.Del(context.Background(), "teste_add_ok")
+
 	rtlRedisRepository := NewRateLimitRedisRepository(rdb)
 	rtlRedisRepository.Add(context.Background(), "teste_add_ok")
 
 	counter, err := rtlRedisRepository.GetByKey(context.Background(), "teste_add_ok")
-	if err != nil {
-		t.Error(err)
-	}
+	assert.Nil(t, err)
 	assert.Equal(t, 1, counter)
 }
 
 func TestRateLimitRepository_SetTimeOutByKey_Ok(t *testing.T) {
+	rdb.Del(context.Background(), "teste_set_timeout_ok")
+
 	rtlRedisRepository := NewRateLimitRedisRepository(rdb)
 	rtlRedisRepository.SetTimeOutByKey(context.Background(), "teste_set_timeout_ok", 2)
 
-	counter, err := rtlRedisRepository.GetByKey(context.Background(), "teste_add_ok")
+	counter, err := rtlRedisRepository.GetByKey(context.Background(), "teste_set_timeout_ok")
 	assert.Nil(t, err)
 	assert.Equal(t, 1, counter)
 
 	time.Sleep(2 * time.Second)
 
-	counter, err = rtlRedisRepository.GetByKey(context.Background(), "teste_add_ok")
-	assert.Nil(t, err)
+	counter, err = rtlRedisRepository.GetByKey(context.Background(), "teste_set_timeout_ok")
+	assert.Equal(t, redis.Nil, err)
 	assert.Equal(t, 0, counter)
 }

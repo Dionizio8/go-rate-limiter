@@ -10,4 +10,6 @@ WORKDIR /app
 COPY --from=build /app/app .
 COPY --from=build /app/cmd/.env .
 COPY --from=build /app/cmd/tokens.json .
+
+EXPOSE 8080
 ENTRYPOINT ["./app"] 
